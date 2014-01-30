@@ -1,5 +1,6 @@
 package net.md_5.bungee.protocol;
 
+import net.md_5.bungee.protocol.packet.ChunkData;
 import net.md_5.bungee.protocol.packet.KeepAlive;
 import net.md_5.bungee.protocol.packet.ClientSettings;
 import net.md_5.bungee.protocol.packet.ClientStatus;
@@ -128,4 +129,7 @@ public abstract class AbstractPacketHandler
     public void handle(LegacyHandshake legacyHandshake) throws Exception
     {
     }
+
+	public void handle(ChunkData chunkData) throws Exception {
+	}
 }
