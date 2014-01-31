@@ -53,6 +53,7 @@ public enum Protocol
                     TO_CLIENT.registerPacket( 0x02, Chat.class );
                     TO_CLIENT.registerPacket( 0x07, Respawn.class );
 //                    TO_CLIENT.registerPacket( 0x21, ChunkData.class );
+//                    TO_CLIENT.registerPacket( 0x08, PlayerPosAndLookServer.class );
                     TO_CLIENT.registerPacket( 0x38, PlayerListItem.class );
                     TO_CLIENT.registerPacket( 0x3A, TabCompleteResponse.class );
                     TO_CLIENT.registerPacket( 0x3B, ScoreboardObjective.class );
