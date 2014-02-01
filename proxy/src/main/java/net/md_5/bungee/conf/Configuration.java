@@ -3,7 +3,9 @@ package net.md_5.bungee.conf;
 import com.google.common.base.Preconditions;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.Files;
+
 import gnu.trove.map.TMap;
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -14,12 +16,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import javax.imageio.ImageIO;
+
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyConfig;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.PatchworkInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.util.CaseInsensitiveMap;
 import net.md_5.bungee.util.CaseInsensitiveSet;
@@ -48,6 +53,10 @@ public class Configuration implements ProxyConfig
      */
     private TMap<String, ServerInfo> servers;
     /**
+     * Set of all patchworks.
+     */
+    private TMap<String, PatchworkInfo> patchworks;
+    /**
      * Should we check minecraft.net auth.
      */
     private boolean onlineMode = true;
@@ -56,6 +65,25 @@ public class Configuration implements ProxyConfig
     private int throttle = 4000;
     private boolean ipFoward;
     public String favicon;
+    
+    private <T extends ServerInfo> Map<String, T> addNoRemove(Map<String, T> entries, Map<String, T> newEntries){
+    	
+        if ( entries == null ) {
+            return new CaseInsensitiveMap<>( newEntries );
+        } else {
+            for ( T oldEntry : entries.values() ) { // Don't allow entries to be removed
+                Preconditions.checkArgument( newEntries.containsValue( oldEntry ), "Server %s removed on reload!", oldEntry.getName() );
+            }
+            // Add new servers
+            for ( Map.Entry<String, T> newEntry : newEntries.entrySet() ) {
+                if ( !entries.containsValue( newEntry.getValue() ) ) {
+                	entries.put( newEntry.getKey(), newEntry.getValue() );
+                }
+            }
+        }
+        
+        return entries;
+    }
 
     public void load()
     {
@@ -102,27 +130,10 @@ public class Configuration implements ProxyConfig
 
         Map<String, ServerInfo> newServers = adapter.getServers();
         Preconditions.checkArgument( newServers != null && !newServers.isEmpty(), "No servers defined" );
+        servers = (TMap<String, ServerInfo>) addNoRemove(servers, newServers);
 
-        if ( servers == null )
-        {
-            servers = new CaseInsensitiveMap<>( newServers );
-        } else
-        {
-            for ( ServerInfo oldServer : servers.values() )
-            {
-                // Don't allow servers to be removed
-                Preconditions.checkArgument( newServers.containsValue( oldServer ), "Server %s removed on reload!", oldServer.getName() );
-            }
-
-            // Add new servers
-            for ( Map.Entry<String, ServerInfo> newServer : newServers.entrySet() )
-            {
-                if ( !servers.containsValue( newServer.getValue() ) )
-                {
-                    servers.put( newServer.getKey(), newServer.getValue() );
-                }
-            }
-        }
+        Map<String, PatchworkInfo> newPatchworks = adapter.getPatchworks(newServers);
+        patchworks = (TMap<String, PatchworkInfo>) addNoRemove(patchworks, newPatchworks);
 
         for ( ListenerInfo listener : listeners )
         {
@@ -137,4 +148,5 @@ public class Configuration implements ProxyConfig
             }
         }
     }
+    
 }

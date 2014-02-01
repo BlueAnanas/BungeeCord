@@ -1,14 +1,18 @@
 package net.md_5.bungee;
 
 import net.md_5.bungee.module.ModuleManager;
+
 import com.google.common.io.ByteStreams;
+
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.log.BungeeLogger;
 import net.md_5.bungee.scheduler.BungeeScheduler;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
@@ -19,6 +23,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 import net.md_5.bungee.conf.Configuration;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -38,6 +43,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import jline.UnsupportedTerminal;
 import jline.console.ConsoleReader;
 import jline.internal.Log;
@@ -49,6 +55,8 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ReconnectHandler;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.PatchInfo;
+import net.md_5.bungee.api.config.PatchworkInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -65,6 +73,7 @@ import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.query.RemoteQuery;
 import net.md_5.bungee.tab.Custom;
 import net.md_5.bungee.util.CaseInsensitiveMap;
+
 import org.fusesource.jansi.AnsiConsole;
 
 /**
@@ -484,7 +493,19 @@ public class BungeeCord extends ProxyServer
         return new BungeeServerInfo( name, address, motd, restricted );
     }
 
-    @Override
+	@Override
+	public PatchInfo constructPatchInfo(ServerInfo server, int minX, int maxX, int minZ, int maxZ) {
+
+		return new BungeePatchInfo(server, minX, maxX, minZ, maxZ);
+	}
+
+	@Override
+	public PatchworkInfo constructPatchworkInfo(String name) {
+
+		return new BungeePatchworkInfo( name );
+	}
+	
+	@Override
     public CommandSender getConsole()
     {
         return ConsoleCommandSender.getInstance();
@@ -544,4 +565,5 @@ public class BungeeCord extends ProxyServer
     {
         return config.getDisabledCommands();
     }
+
 }

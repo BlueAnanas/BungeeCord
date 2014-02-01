@@ -1,6 +1,7 @@
 package net.md_5.bungee;
 
 import com.google.common.base.Preconditions;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -9,12 +10,16 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.internal.PlatformDependent;
+
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +68,9 @@ public final class UserConnection implements ProxiedPlayer
     @Getter
     @Setter
     private ServerConnection server;
+    @Getter
+    @Setter
+    private Collection<ServerConnection> neighbourServers;
     @Getter
     @Setter
     private boolean dimensionChange = true;
