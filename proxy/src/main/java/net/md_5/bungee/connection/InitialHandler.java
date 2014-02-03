@@ -6,8 +6,6 @@ import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import javax.crypto.SecretKey;
 import lombok.Getter;
@@ -35,9 +33,7 @@ import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.netty.cipher.CipherDecoder;
 import net.md_5.bungee.netty.cipher.CipherEncoder;
 import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.packet.Login;
 import net.md_5.bungee.protocol.packet.Handshake;
-import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.EncryptionResponse;
 import net.md_5.bungee.protocol.packet.EncryptionRequest;
 import net.md_5.bungee.protocol.packet.Kick;
@@ -62,18 +58,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     @Getter
     private final ListenerInfo listener;
     @Getter
-    private Login forgeLogin;
-    @Getter
     private Handshake handshake;
     @Getter
     private LoginRequest loginRequest;
     private EncryptionRequest request;
-    @Getter
-    private List<PluginMessage> loginMessages = new ArrayList<>();
-    @Getter
-    private List<PluginMessage> registerMessages = new ArrayList<>();
     private State thisState = State.HANDSHAKE;
-    private SecretKey sharedKey;
     private final Unsafe unsafe = new Unsafe()
     {
         @Override
@@ -84,8 +73,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     };
     @Getter
     private boolean onlineMode = BungeeCord.getInstance().config.isOnlineMode();
-    private InetSocketAddress vHost;
-    private byte version = -1;
+    @Getter
+    private InetSocketAddress virtualHost;
     @Getter
     private String UUID;
 
@@ -108,19 +97,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     }
 
     @Override
-    public void handle(PluginMessage pluginMessage) throws Exception
-    {
-        // TODO: Unregister?
-        if ( pluginMessage.getTag().equals( "REGISTER" ) )
-        {
-            registerMessages.add( pluginMessage );
-        } else
-        {
-            loginMessages.add( pluginMessage );
-        }
-    }
-
-    @Override
     public void handle(LegacyHandshake legacyHandshake) throws Exception
     {
         ch.getHandle().writeAndFlush( bungee.getTranslation( "outdated_client" ) );
@@ -135,7 +111,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
         legacy = bungee.getPluginManager().callEvent( new ProxyPingEvent( this, legacy ) ).getResponse();
 
         String kickMessage = ChatColor.DARK_BLUE
-                + "\00" + legacy.getVersion().getProtocol()
+                + "\00" + 127
                 + "\00" + legacy.getVersion().getName()
                 + "\00" + legacy.getDescription()
                 + "\00" + legacy.getPlayers().getOnline()
@@ -207,7 +183,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
             handshake.setHost( handshake.getHost().substring( 0, handshake.getHost().length() - 1 ) );
         }
 
-        this.vHost = new InetSocketAddress( handshake.getHost(), handshake.getPort() );
+        this.virtualHost = new InetSocketAddress( handshake.getHost(), handshake.getPort() );
         bungee.getLogger().log( Level.INFO, "{0} has connected", this );
 
         bungee.getPluginManager().callEvent( new PlayerHandshakeEvent( InitialHandler.this, handshake ) );
@@ -298,7 +274,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     {
         Preconditions.checkState( thisState == State.ENCRYPT, "Not expecting ENCRYPT" );
 
-        sharedKey = EncryptionUtil.getSecret( encryptResponse, request );
+        SecretKey sharedKey = EncryptionUtil.getSecret( encryptResponse, request );
         BungeeCipher decrypt = EncryptionUtil.getCipher( false, sharedKey );
         ch.addBefore( PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder( decrypt ) );
         BungeeCipher encrypt = EncryptionUtil.getCipher( true, sharedKey );
@@ -410,7 +386,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     }
 
     @Override
-    public synchronized void disconnect(String reason)
+    public void disconnect(String reason)
     {
         if ( !ch.isClosed() )
         {
@@ -447,13 +423,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     @Override
     public int getVersion()
     {
-        return ( handshake == null ) ? version : handshake.getProtocolVersion();
-    }
-
-    @Override
-    public InetSocketAddress getVirtualHost()
-    {
-        return vHost;
+        return ( handshake == null ) ? -1 : handshake.getProtocolVersion();
     }
 
     @Override

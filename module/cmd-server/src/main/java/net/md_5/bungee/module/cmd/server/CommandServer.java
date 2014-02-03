@@ -11,6 +11,11 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 /**
  * Command to list and switch a player between available servers.
@@ -35,21 +40,21 @@ public class CommandServer extends Command implements TabExecutor
         if ( args.length == 0 )
         {
             player.sendMessage( ProxyServer.getInstance().getTranslation( "current_server" ) + player.getServer().getInfo().getName() );
-
-            StringBuilder serverList = new StringBuilder();
+            TextComponent serverList = new TextComponent( ProxyServer.getInstance().getTranslation( "server_list" ) );
+            serverList.setColor( ChatColor.GOLD );
+            boolean first = true;
             for ( ServerInfo server : servers.values() )
             {
                 if ( server.canAccess( player ) )
                 {
-                    serverList.append( server.getName() );
-                    serverList.append( ", " );
+                    TextComponent serverTextComponent = new TextComponent( first ? server.getName() : ", " + server.getName() );
+                    serverTextComponent.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(server.getPlayers().size() + " players").create() ) );
+                    serverTextComponent.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/server " + server.getName() ) );
+                    serverList.addExtra( serverTextComponent );
+                    first = false;
                 }
             }
-            if ( serverList.length() != 0 )
-            {
-                serverList.setLength( serverList.length() - 2 );
-            }
-            player.sendMessage( ProxyServer.getInstance().getTranslation( "server_list" ) + serverList.toString() );
+            player.sendMessage( serverList );
         } else
         {
             ServerInfo server = servers.get( args[0] );
