@@ -61,7 +61,6 @@ public interface ConfigurationAdapter
 
     /**
      * Get the configuration all patchworks which may be accessible via the proxy.
-     * @param servers 
      *
      * @return all accessible patchworks, keyed by name
      */

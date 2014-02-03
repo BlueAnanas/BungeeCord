@@ -494,9 +494,9 @@ public class BungeeCord extends ProxyServer
     }
 
 	@Override
-	public PatchInfo constructPatchInfo(ServerInfo server, int minX, int maxX, int minZ, int maxZ) {
+	public PatchInfo constructPatchInfo(ServerInfo server, int minX, int maxX, int minZ, int maxZ, int viewDistance, int connectDistance) {
 
-		return new BungeePatchInfo(server, minX, maxX, minZ, maxZ);
+		return new BungeePatchInfo(server, minX, maxX, minZ, maxZ, viewDistance, connectDistance);
 	}
 
 	@Override

@@ -206,17 +206,19 @@ public abstract class ProxyServer
      * Factory method to construct an implementation specific patch server info
      * instance.
      *
-     * @param a serverInfo instance
-     * @param min X coordinate
-     * @param max X coordinate
-     * @param min Z coordinate
-     * @param max Z coordinate
+     * @param server a ServerInfo instance
+     * @param minX min X coordinate
+     * @param maxX max X coordinate
+     * @param minZ min Z coordinate
+     * @param maxZ max Z coordinate
+     * @param viewDistance view distance into other server in chunks
+     * @param connectDistance below this distance in chunks connection to other server will be initiated
      * @return the constructed instance
      */
-    public abstract PatchInfo constructPatchInfo(ServerInfo server, int minX, int maxX, int minZ, int maxZ);
+    public abstract PatchInfo constructPatchInfo(ServerInfo server, int minX, int maxX, int minZ, int maxZ, int viewDistance, int connectDistance);
 
     /**
-     * Factory method to construct an implementation specific server info
+     * Factory method to construct an implementation specific patchwork info
      * instance.
      *
      * @param name name of the patchwork

@@ -18,6 +18,10 @@ public class BungeePatchInfo implements PatchInfo {
     private final int minZ;
     @Getter
     private final int maxZ;
+    @Getter
+    private final int viewDistance;
+    @Getter
+    private final int connectDistance;
     
 	@Override
 	public String getName() {

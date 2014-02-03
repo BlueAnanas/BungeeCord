@@ -190,7 +190,7 @@ public class YamlConfig implements ConfigurationAdapter
         Map<String, Map<String, Map<String, Object>>> base = get( "patchworks", (Map<String, Map<String, Map<String, Object>>>) null );
         Map<String, PatchworkInfo> ret = new HashMap<>();
 
-        for ( Map.Entry<String, Map<String, Map<String, Object>>> entry : base.entrySet() ){
+        if (base != null) for ( Map.Entry<String, Map<String, Map<String, Object>>> entry : base.entrySet() ){
             Map<String, Map<String, Object>> pw = entry.getValue();
             String pwName = entry.getKey();
             PatchworkInfo pwInfo = ProxyServer.getInstance().constructPatchworkInfo(pwName);
@@ -199,11 +199,13 @@ public class YamlConfig implements ConfigurationAdapter
                 String pName = subEntry.getKey();
                 ServerInfo sInfo = servers.get(pName);
                 if (sInfo != null){ // we simply drop if server is not already declared :(
-                	int minX = get( "border.minx", Integer.MIN_VALUE, p );
-                	int maxX = get( "border.maxx", Integer.MAX_VALUE, p );
-                	int minZ = get( "border.minz", Integer.MIN_VALUE, p );
-                	int maxZ = get( "border.maxz", Integer.MAX_VALUE, p );
-                	PatchInfo pInfo = ProxyServer.getInstance().constructPatchInfo(sInfo, minX, maxX, minZ, maxZ);
+                	int minX = get( "borders.minx", Integer.MIN_VALUE, p );
+                	int maxX = get( "borders.maxx", Integer.MAX_VALUE, p );
+                	int minZ = get( "borders.minz", Integer.MIN_VALUE, p );
+                	int maxZ = get( "borders.maxz", Integer.MAX_VALUE, p );
+                	int viewDist = get( "dist.view", 10, p );
+                	int connectDist = get( "dist.connect", viewDist + 1, p );
+                	PatchInfo pInfo = ProxyServer.getInstance().constructPatchInfo(sInfo, minX, maxX, minZ, maxZ, viewDist, connectDist);
                 	pwInfo.addPatch(pInfo);
                 }
             }
