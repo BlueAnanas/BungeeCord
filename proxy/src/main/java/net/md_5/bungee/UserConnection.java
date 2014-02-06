@@ -70,9 +70,6 @@ public final class UserConnection implements ProxiedPlayer
     private ServerConnection server;
     @Getter
     @Setter
-    private Collection<ServerConnection> neighbourServers;
-    @Getter
-    @Setter
     private boolean dimensionChange = true;
     @Getter
     private final Object switchMutex = new Object();
