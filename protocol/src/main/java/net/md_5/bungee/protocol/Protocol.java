@@ -49,11 +49,16 @@ public enum Protocol
                 
                 {
                     TO_CLIENT.registerPacket( 0x00, KeepAlive.class );
+                    FROM_HOMEPATCH.registerPacket( 0x00, KeepAlive.class );
+                    FROM_OTHERPATCH.registerPacket( 0x00, KeepAlive.class );
                     TO_CLIENT.registerPacket( 0x01, Login.class );
+                    FROM_HOMEPATCH.registerPacket( 0x01, Login.class );
+                    FROM_OTHERPATCH.registerPacket( 0x01, Login.class );
                     TO_CLIENT.registerPacket( 0x02, Chat.class );
                     TO_CLIENT.registerPacket( 0x07, Respawn.class );
-//                    TO_CLIENT.registerPacket( 0x21, ChunkData.class );
-//                    TO_CLIENT.registerPacket( 0x08, PlayerPosAndLookServer.class );
+//                    FROM_HOMEPATCH.registerPacket( 0x21, ChunkData.class );
+//                    FROM_OTHERPATCH.registerPacket( 0x21, ChunkData.class );
+//                    FROM_HOMEPATCH.registerPacket( 0x08, PlayerPosAndLookServer.class );
                     TO_CLIENT.registerPacket( 0x38, PlayerListItem.class );
                     TO_CLIENT.registerPacket( 0x3A, TabCompleteResponse.class );
                     TO_CLIENT.registerPacket( 0x3B, ScoreboardObjective.class );
@@ -103,6 +108,10 @@ public enum Protocol
     /*========================================================================*/
     public final ProtocolDirection TO_SERVER = new ProtocolDirection( "TO_SERVER" );
     public final ProtocolDirection TO_CLIENT = new ProtocolDirection( "TO_CLIENT" );
+    /* FROM_HOMEPATCH is coming from the patch server where the player is currently in the bordered area */
+    public final ProtocolDirection FROM_HOMEPATCH = new ProtocolDirection( "FROM_HOMEPATCH" );
+    /* FROM_OTHERPATCH is coming from a patch server where the player is outside of the bordered area */
+    public final ProtocolDirection FROM_OTHERPATCH = new ProtocolDirection( "FROM_OTHERPATCH" );
 
     @RequiredArgsConstructor
     public class ProtocolDirection
@@ -122,6 +131,10 @@ public enum Protocol
         public String toString()
         {
             return name;
+        }
+        
+        public boolean isEmpty(){
+        	return packetMap.isEmpty();
         }
 
         public final DefinedPacket createPacket(int id)
