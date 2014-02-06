@@ -53,10 +53,6 @@ public class Configuration implements ProxyConfig
      */
     private TMap<String, ServerInfo> servers;
     /**
-     * Set of all patchworks.
-     */
-    private TMap<String, PatchworkInfo> patchworks;
-    /**
      * Should we check minecraft.net auth.
      */
     private boolean onlineMode = true;
@@ -66,16 +62,16 @@ public class Configuration implements ProxyConfig
     private boolean ipFoward;
     public String favicon;
     
-    private <T extends ServerInfo> Map<String, T> addNoRemove(Map<String, T> entries, Map<String, T> newEntries){
+    private Map<String, ServerInfo> addNoRemove(Map<String, ServerInfo> entries, Map<String, ServerInfo> newEntries){
     	
         if ( entries == null ) {
             return new CaseInsensitiveMap<>( newEntries );
         } else {
-            for ( T oldEntry : entries.values() ) { // Don't allow entries to be removed
+            for ( ServerInfo oldEntry : entries.values() ) { // Don't allow entries to be removed
                 Preconditions.checkArgument( newEntries.containsValue( oldEntry ), "Server %s removed on reload!", oldEntry.getName() );
             }
             // Add new servers
-            for ( Map.Entry<String, T> newEntry : newEntries.entrySet() ) {
+            for ( Map.Entry<String, ServerInfo> newEntry : newEntries.entrySet() ) {
                 if ( !entries.containsValue( newEntry.getValue() ) ) {
                 	entries.put( newEntry.getKey(), newEntry.getValue() );
                 }
@@ -138,8 +134,8 @@ public class Configuration implements ProxyConfig
         Preconditions.checkArgument( newServers != null && !newServers.isEmpty(), "No servers defined" );
         servers = (TMap<String, ServerInfo>) addNoRemove(servers, newServers);
 
-        Map<String, PatchworkInfo> newPatchworks = adapter.getPatchworks(newServers);
-        patchworks = (TMap<String, PatchworkInfo>) addNoRemove(patchworks, newPatchworks);
+        Map<String, ServerInfo> newPatchworks = adapter.getPatchworks(newServers);
+        servers = (TMap<String, ServerInfo>) addNoRemove(servers, newPatchworks);
 
         for ( ListenerInfo listener : listeners )
         {
