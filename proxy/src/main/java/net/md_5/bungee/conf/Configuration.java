@@ -134,8 +134,7 @@ public class Configuration implements ProxyConfig
         Preconditions.checkArgument( newServers != null && !newServers.isEmpty(), "No servers defined" );
         servers = (TMap<String, ServerInfo>) addNoRemove(servers, newServers);
 
-        Map<String, ServerInfo> newPatchworks = adapter.getPatchworks(newServers);
-        servers = (TMap<String, ServerInfo>) addNoRemove(servers, newPatchworks);
+        servers.putAll(adapter.getPatchworks(newServers));
 
         for ( ListenerInfo listener : listeners )
         {

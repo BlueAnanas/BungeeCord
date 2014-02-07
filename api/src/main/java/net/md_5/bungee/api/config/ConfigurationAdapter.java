@@ -64,7 +64,7 @@ public interface ConfigurationAdapter
      *
      * @return all accessible patchworks, keyed by name
      */
-    public Map<String, ServerInfo> getPatchworks(Map<String, ServerInfo> servers);
+    public Map<String, PatchworkInfo> getPatchworks(Map<String, ServerInfo> servers);
 
     /**
      * Get information about all hosts to bind the proxy to.

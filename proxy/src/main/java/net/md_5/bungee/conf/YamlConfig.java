@@ -185,10 +185,10 @@ public class YamlConfig implements ConfigurationAdapter
     }
 
     @Override
-    public Map<String, ServerInfo> getPatchworks(Map<String, ServerInfo> servers)
+    public Map<String, PatchworkInfo> getPatchworks(Map<String, ServerInfo> servers)
     {
         Map<String, Map<String, Map<String, Object>>> base = get( "patchworks", (Map<String, Map<String, Map<String, Object>>>) null );
-        Map<String, ServerInfo> ret = new HashMap<>();
+        Map<String, PatchworkInfo> ret = new HashMap<>();
 
         if (base != null) for ( Map.Entry<String, Map<String, Map<String, Object>>> entry : base.entrySet() ){
             Map<String, Map<String, Object>> pw = entry.getValue();
