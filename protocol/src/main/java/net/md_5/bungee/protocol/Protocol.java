@@ -1,13 +1,17 @@
 package net.md_5.bungee.protocol;
 
 import com.google.common.base.Preconditions;
+
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.protocol.packet.Chat;
+import net.md_5.bungee.protocol.packet.ChunkData;
 import net.md_5.bungee.protocol.packet.ClientSettings;
 import net.md_5.bungee.protocol.packet.EncryptionRequest;
 import net.md_5.bungee.protocol.packet.EncryptionResponse;
@@ -19,6 +23,7 @@ import net.md_5.bungee.protocol.packet.LoginRequest;
 import net.md_5.bungee.protocol.packet.LoginSuccess;
 import net.md_5.bungee.protocol.packet.PingPacket;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerPosAndLookServer;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.Respawn;
 import net.md_5.bungee.protocol.packet.ScoreboardDisplay;
@@ -50,23 +55,31 @@ public enum Protocol
                 {
                     TO_CLIENT.registerPacket( 0x00, KeepAlive.class );
                     FROM_HOMEPATCH.registerPacket( 0x00, KeepAlive.class );
-                    FROM_OTHERPATCH.registerPacket( 0x00, KeepAlive.class );
                     TO_CLIENT.registerPacket( 0x01, Login.class );
                     FROM_HOMEPATCH.registerPacket( 0x01, Login.class );
-                    FROM_OTHERPATCH.registerPacket( 0x01, Login.class );
                     TO_CLIENT.registerPacket( 0x02, Chat.class );
+                    FROM_HOMEPATCH.registerPacket( 0x02, Chat.class );
                     TO_CLIENT.registerPacket( 0x07, Respawn.class );
-//                    FROM_HOMEPATCH.registerPacket( 0x21, ChunkData.class );
+                    FROM_HOMEPATCH.registerPacket( 0x07, Respawn.class );
+                    FROM_HOMEPATCH.registerPacket( 0x21, ChunkData.class );
 //                    FROM_OTHERPATCH.registerPacket( 0x21, ChunkData.class );
-//                    FROM_HOMEPATCH.registerPacket( 0x08, PlayerPosAndLookServer.class );
+                    FROM_HOMEPATCH.registerPacket( 0x08, PlayerPosAndLookServer.class );
                     TO_CLIENT.registerPacket( 0x38, PlayerListItem.class );
+                    FROM_HOMEPATCH.registerPacket( 0x38, PlayerListItem.class );
                     TO_CLIENT.registerPacket( 0x3A, TabCompleteResponse.class );
+                    FROM_HOMEPATCH.registerPacket( 0x3A, TabCompleteResponse.class );
                     TO_CLIENT.registerPacket( 0x3B, ScoreboardObjective.class );
+                    FROM_HOMEPATCH.registerPacket( 0x3B, ScoreboardObjective.class );
                     TO_CLIENT.registerPacket( 0x3C, ScoreboardScore.class );
+                    FROM_HOMEPATCH.registerPacket( 0x3C, ScoreboardScore.class );
                     TO_CLIENT.registerPacket( 0x3D, ScoreboardDisplay.class );
+                    FROM_HOMEPATCH.registerPacket( 0x3D, ScoreboardDisplay.class );
                     TO_CLIENT.registerPacket( 0x3E, Team.class );
+                    FROM_HOMEPATCH.registerPacket( 0x3E, Team.class );
                     TO_CLIENT.registerPacket( 0x3F, PluginMessage.class );
+                    FROM_HOMEPATCH.registerPacket( 0x3F, PluginMessage.class );
                     TO_CLIENT.registerPacket( 0x40, Kick.class );
+                    FROM_HOMEPATCH.registerPacket( 0x40, Kick.class );
 
                     TO_SERVER.registerPacket( 0x00, KeepAlive.class );
                     TO_SERVER.registerPacket( 0x01, Chat.class );

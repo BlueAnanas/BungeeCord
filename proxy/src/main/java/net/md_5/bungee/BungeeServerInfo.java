@@ -131,4 +131,10 @@ public class BungeeServerInfo implements ServerInfo
                 .connect()
                 .addListener( listener );
     }
+    
+    @Override
+    public ServerInfo cloneIfNeeded(){
+    	return this;  // only PatchworkInfo needs some cloning
+    }
+
 }

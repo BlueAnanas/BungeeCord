@@ -3,6 +3,7 @@ package net.md_5.bungee;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.LinkedList;
+
 import com.google.common.base.Preconditions;
 
 import net.md_5.bungee.api.Callback;
@@ -10,6 +11,7 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.PatchInfo;
 import net.md_5.bungee.api.config.PatchworkInfo;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeePatchworkInfo extends BungeeServerInfo implements PatchworkInfo {
@@ -93,6 +95,16 @@ public class BungeePatchworkInfo extends BungeeServerInfo implements PatchworkIn
     public int hashCode() // TODO: can be moved to superclass - is subclasssecure
     {
         return getAddress().hashCode();
+    }
+
+    @Override
+    public ServerInfo cloneIfNeeded(){
+    	BungeePatchworkInfo bpwi = new BungeePatchworkInfo(this.getName());
+    	for(PatchInfo bpi: this.getPatchInfos()){
+    		bpwi.addPatch(bpi);
+    	}
+    	bpwi.setCurrentPatchInfo(currentPatchInfo);
+    	return bpwi; 
     }
 
 

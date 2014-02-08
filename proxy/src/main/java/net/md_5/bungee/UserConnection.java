@@ -12,11 +12,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.internal.PlatformDependent;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -204,7 +202,7 @@ public final class UserConnection implements ProxiedPlayer
             return;
         }
 
-        final BungeeServerInfo target = (BungeeServerInfo) event.getTarget(); // Update in case the event changed target
+        final BungeeServerInfo target = (BungeeServerInfo) event.getTarget().cloneIfNeeded(); // Update in case the event changed target
 
         if ( getServer() != null && Objects.equals( getServer().getInfo(), target ) )
         {
@@ -218,18 +216,29 @@ public final class UserConnection implements ProxiedPlayer
         }
 
         pendingConnects.add( target );
-
-        ChannelInitializer initializer = new ChannelInitializer()
-        {
-            @Override
-            protected void initChannel(Channel ch) throws Exception
-            {
-                PipelineUtils.BASE.initChannel( ch );
-                ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
-                ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
-                ch.pipeline().get( HandlerBoss.class ).setHandler( new ServerConnector( bungee, UserConnection.this, target ) );
-            }
-        };
+        ChannelInitializer initializer;
+        
+        if (target instanceof BungeePatchworkInfo) {
+        	initializer = new ChannelInitializer() {
+        		@Override
+        		protected void initChannel(Channel ch) throws Exception {
+        			PipelineUtils.BASE.initChannel( ch );
+        			ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, "FROM_HOMEPATCH", getPendingConnection().getVersion() ) );
+        			ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, "TO_SERVER", getPendingConnection().getVersion() ) );
+        			ch.pipeline().get( HandlerBoss.class ).setHandler( new ServerConnector( bungee, UserConnection.this, target ) );
+        		}
+        	};
+    	} else {
+    		initializer = new ChannelInitializer(){
+    			@Override
+    			protected void initChannel(Channel ch) throws Exception {
+    				PipelineUtils.BASE.initChannel( ch );
+    				ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
+    				ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
+    				ch.pipeline().get( HandlerBoss.class ).setHandler( new ServerConnector( bungee, UserConnection.this, target ) );
+    			}
+    		};
+    	}
         ChannelFutureListener listener = new ChannelFutureListener()
         {
             @Override

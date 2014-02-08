@@ -1,5 +1,6 @@
 package net.md_5.bungee.connection;
 
+import lombok.Getter;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.EntityMap;
 import net.md_5.bungee.UserConnection;
@@ -16,14 +17,18 @@ import net.md_5.bungee.protocol.packet.Chat;
 import net.md_5.bungee.protocol.packet.TabCompleteRequest;
 import net.md_5.bungee.protocol.packet.ClientSettings;
 import net.md_5.bungee.protocol.packet.PluginMessage;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
 public class UpstreamBridge extends PacketHandler
 {
 
+    @Getter
     private final ProxyServer bungee;
+    @Getter
     private final UserConnection con;
 
     public UpstreamBridge(ProxyServer bungee, UserConnection con)

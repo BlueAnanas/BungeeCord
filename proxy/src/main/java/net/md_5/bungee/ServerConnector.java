@@ -67,7 +67,7 @@ public class ServerConnector extends PacketHandler
     {
         this.ch = channel;
 
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        ByteArrayDataOutput out = ByteStreams.newDataOutput(); // TODO: out is never used now, delete from code?
         out.writeUTF( "Login" );
         out.writeUTF( user.getAddress().getHostString() );
         out.writeInt( user.getAddress().getPort() );

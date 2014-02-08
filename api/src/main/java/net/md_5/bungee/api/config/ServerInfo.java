@@ -66,4 +66,12 @@ public interface ServerInfo
      * @param callback the callback to call when the count has been retrieved.
      */
     void ping(Callback<ServerPing> callback);
+
+    /**
+     * Clone the server info if needed because it has connection specific properties
+     * don't clone if infos need to stay unique.
+     *
+     * @param callback the callback to call when the count has been retrieved.
+     */
+    ServerInfo cloneIfNeeded();
 }
