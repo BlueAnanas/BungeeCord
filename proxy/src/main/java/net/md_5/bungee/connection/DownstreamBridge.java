@@ -2,8 +2,11 @@ package net.md_5.bungee.connection;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+
 import java.io.DataInput;
 import java.util.Objects;
+
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.EntityMap;
 import net.md_5.bungee.ServerConnection;
@@ -36,6 +39,7 @@ import net.md_5.bungee.protocol.packet.Kick;
 public class DownstreamBridge extends PacketHandler
 {
 
+    @Getter
     private final ProxyServer bungee;
     private final UserConnection con;
     private final ServerConnection server;

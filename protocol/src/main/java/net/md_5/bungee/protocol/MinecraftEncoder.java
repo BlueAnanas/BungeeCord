@@ -10,11 +10,13 @@ public class MinecraftEncoder extends MessageToByteEncoder<DefinedPacket>
 {
 
     private ProtocolDirection protocolDirection;
+    private Protocol protocol;
     private ProtocolDirection formalProtocolDirection;
     @Setter
     private int protocolVersion;
 
     public MinecraftEncoder(Protocol prot, boolean serv, int protVer){
+    	protocol = prot;
     	formalProtocolDirection = ( serv ) ? prot.TO_CLIENT : prot.TO_SERVER;
     	protocolDirection = formalProtocolDirection;
     	protocolVersion = protVer;
@@ -26,6 +28,7 @@ public class MinecraftEncoder extends MessageToByteEncoder<DefinedPacket>
     }
     
     public void setProtocolAndDirection(Protocol prot, String protDirName){
+    	protocol = prot;
     	try {
 			formalProtocolDirection = (ProtocolDirection) Protocol.class.getDeclaredField(protDirName).get(prot);
 		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
@@ -49,6 +52,9 @@ public class MinecraftEncoder extends MessageToByteEncoder<DefinedPacket>
     	setProtocolAndDirection(prot, formalProtocolDirection.toString());
     }
     
+    public void setDirection(String protDirName){
+    	setProtocolAndDirection(protocol, protDirName);
+    }
     
     @Override
     protected void encode(ChannelHandlerContext ctx, DefinedPacket msg, ByteBuf out) throws Exception

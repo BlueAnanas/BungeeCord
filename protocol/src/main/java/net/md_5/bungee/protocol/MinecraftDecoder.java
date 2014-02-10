@@ -13,12 +13,14 @@ public class MinecraftDecoder extends ByteToMessageDecoder
 {
 
     private ProtocolDirection protocolDirection;
+    private Protocol protocol;
     private ProtocolDirection formalProtocolDirection;
     @Setter
     private int protocolVersion;
 
     public MinecraftDecoder(Protocol prot, boolean serv, int protVer){
-    	formalProtocolDirection = ( serv ) ? prot.TO_CLIENT : prot.TO_SERVER;
+    	protocol = prot;
+    	formalProtocolDirection = ( serv ) ? prot.TO_SERVER : prot.TO_CLIENT;
     	protocolDirection = formalProtocolDirection;
     	protocolVersion = protVer;
     }
@@ -29,8 +31,9 @@ public class MinecraftDecoder extends ByteToMessageDecoder
     }
     
     public void setProtocolAndDirection(Protocol prot, String protDirName){
+    	protocol = prot;
     	try {
-			formalProtocolDirection = (ProtocolDirection) Protocol.class.getDeclaredField(protDirName).get(prot);
+    		formalProtocolDirection = (ProtocolDirection) Protocol.class.getDeclaredField(protDirName).get(prot);
 		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,13 +55,17 @@ public class MinecraftDecoder extends ByteToMessageDecoder
     	setProtocolAndDirection(prot, formalProtocolDirection.toString());
     }
     
+    public void setDirection(String protDirName){
+    	setProtocolAndDirection(protocol, protDirName);
+    }
+    
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
     {
         ByteBuf copy = in.copy(); // TODO
 
         int packetId = DefinedPacket.readVarInt( in );
-
+        
         DefinedPacket packet = null;
         if ( protocolDirection.hasPacket( packetId ) )
         {
@@ -72,7 +79,7 @@ public class MinecraftDecoder extends ByteToMessageDecoder
         {
             in.skipBytes( in.readableBytes() );
         }
-
+        
         out.add( new PacketWrapper( packet, copy ) );
     }
 }

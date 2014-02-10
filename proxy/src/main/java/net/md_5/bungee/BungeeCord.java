@@ -1,18 +1,5 @@
 package net.md_5.bungee;
 
-import net.md_5.bungee.module.ModuleManager;
-
-import com.google.common.io.ByteStreams;
-
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
-import net.md_5.bungee.log.BungeeLogger;
-import net.md_5.bungee.scheduler.BungeeScheduler;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.Gson;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
@@ -22,7 +9,6 @@ import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
-import net.md_5.bungee.conf.Configuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +39,8 @@ import lombok.Synchronized;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ReconnectHandler;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.PatchInfo;
@@ -62,19 +50,33 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.api.tab.CustomTabList;
-import net.md_5.bungee.command.*;
+import net.md_5.bungee.chat.ComponentSerializer;
+import net.md_5.bungee.command.CommandBungee;
+import net.md_5.bungee.command.CommandEnd;
+import net.md_5.bungee.command.CommandIP;
+import net.md_5.bungee.command.CommandPerms;
+import net.md_5.bungee.command.CommandReload;
+import net.md_5.bungee.command.ConsoleCommandSender;
+import net.md_5.bungee.conf.Configuration;
 import net.md_5.bungee.conf.YamlConfig;
+import net.md_5.bungee.log.BungeeLogger;
 import net.md_5.bungee.log.LoggingOutputStream;
+import net.md_5.bungee.module.ModuleManager;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.packet.Chat;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.query.RemoteQuery;
+import net.md_5.bungee.scheduler.BungeeScheduler;
 import net.md_5.bungee.tab.Custom;
 import net.md_5.bungee.util.CaseInsensitiveMap;
 
 import org.fusesource.jansi.AnsiConsole;
+
+import com.google.common.io.ByteStreams;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
 
 /**
  * Main BungeeCord proxy class.

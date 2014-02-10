@@ -13,16 +13,13 @@ public class PatchworkUpstreamBridge extends UpstreamBridge {
     
     @Override
     public void handle(ChunkData chunkData){
-    	this.getBungee().getLogger().info( "ChunkData "+chunkData.getChunkX()+"X "+chunkData.getChunkZ()+"Z grCont="+chunkData.isGroundUpContinuous() );
-        this.getCon().getServer().getCh().write( chunkData );
+    	this.getBungee().getLogger().info( "Upstream: Packet_ChunkData "+chunkData.getChunkX()+"X "+chunkData.getChunkZ()+"Z grCont="+chunkData.isGroundUpContinuous() );
     }
     
     @Override
     public void handle(PlayerPosAndLookServer playerPosAndLook){
-    	this.getBungee().getLogger().info( "Player "+playerPosAndLook.getX()+"X "+playerPosAndLook.getY()+"Y "+playerPosAndLook.getZ()+"Z "
+    	this.getBungee().getLogger().info( "Upstream: Packet_Player "+playerPosAndLook.getX()+"X "+playerPosAndLook.getY()+"Y "+playerPosAndLook.getZ()+"Z "
          +playerPosAndLook.getPitch()+"Pitch "+playerPosAndLook.getYaw()+"Yaw OnGround="+playerPosAndLook.isOnGround() );
-        this.getCon().getServer().getCh().write( playerPosAndLook );
-    	
     }
 
 }

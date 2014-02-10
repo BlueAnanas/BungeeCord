@@ -3,8 +3,10 @@ package net.md_5.bungee;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+
 import java.util.Objects;
 import java.util.Queue;
+
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -18,6 +20,7 @@ import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.connection.CancelSendSignal;
 import net.md_5.bungee.connection.DownstreamBridge;
+import net.md_5.bungee.connection.PatchworkDownstreamBridge;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.PacketHandler;
@@ -183,7 +186,7 @@ public class ServerConnector extends PacketHandler
             user.setDimensionChange( false );
 
             user.setServer( server );
-            ch.getHandle().pipeline().get( HandlerBoss.class ).setHandler( new DownstreamBridge( bungee, user, server ) );
+            ch.getHandle().pipeline().get( HandlerBoss.class ).setHandler( target instanceof BungeePatchworkInfo ? new PatchworkDownstreamBridge( bungee, user, server ) : new DownstreamBridge( bungee, user, server ) );
         }
 
         bungee.getPluginManager().callEvent( new ServerSwitchEvent( user ) );

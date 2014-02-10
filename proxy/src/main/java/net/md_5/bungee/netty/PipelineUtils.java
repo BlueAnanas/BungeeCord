@@ -40,6 +40,7 @@ public class PipelineUtils
                 // ch.close();
                 // return;
             }
+            ProxyServer.getInstance().getLogger().info( "Listener channel init: " + ch.remoteAddress() );
 
             BASE.initChannel( ch );
             ch.pipeline().addBefore( FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder() );

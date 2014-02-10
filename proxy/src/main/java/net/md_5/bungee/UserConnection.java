@@ -219,6 +219,7 @@ public final class UserConnection implements ProxiedPlayer
         ChannelInitializer initializer;
         
         if (target instanceof BungeePatchworkInfo) {
+        	bungee.getLogger().info( "UserConnection.connect() with ProtocolDirection FROM_HOMEPATCH" );
         	initializer = new ChannelInitializer() {
         		@Override
         		protected void initChannel(Channel ch) throws Exception {

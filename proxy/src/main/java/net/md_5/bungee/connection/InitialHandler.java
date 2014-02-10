@@ -2,12 +2,15 @@ package net.md_5.bungee.connection;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.logging.Level;
+
 import javax.crypto.SecretKey;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.*;
@@ -362,7 +365,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
 
                             bungee.getPluginManager().callEvent( new PostLoginEvent( userCon ) );
 
-                            ch.getHandle().pipeline().get( HandlerBoss.class ).setHandler( new UpstreamBridge( bungee, userCon ) );
+                            ch.getHandle().pipeline().get( HandlerBoss.class ).setHandler( new PatchworkUpstreamBridge( bungee, userCon ) );
 
                             ServerInfo server;
                             if ( bungee.getReconnectHandler() != null )
