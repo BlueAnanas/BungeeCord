@@ -6,10 +6,7 @@ import java.util.LinkedList;
 
 import lombok.Getter;
 
-import com.google.common.base.Preconditions;
-
 import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.PatchInfo;
 import net.md_5.bungee.api.config.PatchworkInfo;
@@ -76,20 +73,5 @@ public class BungeePatchworkInfo extends BungeeServerInfo implements PatchworkIn
     {
     	currentPatchInfo.ping(callback);
     }
-
-    /* following methods should be moved to superclass so they don't need to be overridden in both subclasses */
-    @Override
-    public boolean canAccess(CommandSender player) // TODO: can be moved to superclass - is subclasssecure
-    {
-        Preconditions.checkNotNull( player, "player" );
-        return !isRestricted() || player.hasPermission( "bungeecord.server." + getName() );
-    }
-
-    @Override
-    public int hashCode() // TODO: can be moved to superclass - is subclasssecure
-    {
-        return getAddress().hashCode();
-    }
-
 
 }

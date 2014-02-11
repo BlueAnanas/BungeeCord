@@ -2,11 +2,8 @@ package net.md_5.bungee;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import com.google.common.base.Preconditions;
-
 import lombok.Getter;
 import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.PatchInfo;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -82,20 +79,6 @@ public class BungeePatchInfo extends BungeeServerInfo implements PatchInfo {
     public void ping(final Callback<ServerPing> callback)
     {
         server.ping(callback);
-    }
-
-    /* following methods could be moved to superclass so they don't need to be overridden */
-    @Override
-    public boolean canAccess(CommandSender player) // TODO: can be moved to superclass - is subclasssecure
-    {
-        Preconditions.checkNotNull( player, "player" );
-        return !isRestricted() || player.hasPermission( "bungeecord.server." + getName() );
-    }
-
-    @Override
-    public int hashCode() // TODO: can be moved to superclass - is subclasssecure
-    {
-        return getAddress().hashCode();
     }
 
 }
