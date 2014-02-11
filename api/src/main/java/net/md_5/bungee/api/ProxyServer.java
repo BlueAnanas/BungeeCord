@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import lombok.Getter;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
+import net.md_5.bungee.api.config.PatchInfo;
+import net.md_5.bungee.api.config.PatchworkInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -196,6 +198,30 @@ public abstract class ProxyServer
      * @return the constructed instance
      */
     public abstract ServerInfo constructServerInfo(String name, InetSocketAddress address, String motd, boolean restricted);
+
+    /**
+     * Factory method to construct an implementation specific patch server info
+     * instance.
+     *
+     * @param server a ServerInfo instance
+     * @param minX min X coordinate
+     * @param maxX max X coordinate
+     * @param minZ min Z coordinate
+     * @param maxZ max Z coordinate
+     * @param viewDistance view distance into other patches in chunks
+     * @param connectDistance below this distance in chunks connection to other patches will be initiated
+     * @return the constructed instance
+     */
+    public abstract PatchInfo constructPatchInfo(ServerInfo server, int minX, int maxX, int minZ, int maxZ, int viewDistance, int connectDistance);
+
+    /**
+     * Factory method to construct an implementation specific patchwork info
+     * instance.
+     *
+     * @param name name of the patchwork
+     * @return the constructed instance
+     */
+    public abstract PatchworkInfo constructPatchworkInfo(String name);
 
     /**
      * Returns the console overlord for this proxy. Being the console, this
