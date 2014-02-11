@@ -68,7 +68,7 @@ public class BungeeServerInfo implements ServerInfo
     public boolean canAccess(CommandSender player)
     {
         Preconditions.checkNotNull( player, "player" );
-        return !restricted || player.hasPermission( "bungeecord.server." + name );
+        return !isRestricted() || player.hasPermission( "bungeecord.server." + getName() );
     }
 
     @Override
@@ -80,7 +80,7 @@ public class BungeeServerInfo implements ServerInfo
     @Override
     public int hashCode()
     {
-        return address.hashCode();
+        return getAddress().hashCode();
     }
 
     // TODO: Don't like this method
