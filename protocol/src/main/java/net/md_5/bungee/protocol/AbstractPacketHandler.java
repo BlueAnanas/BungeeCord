@@ -1,5 +1,6 @@
 package net.md_5.bungee.protocol;
 
+import net.md_5.bungee.protocol.packet.ChunkData;
 import net.md_5.bungee.protocol.packet.KeepAlive;
 import net.md_5.bungee.protocol.packet.ClientSettings;
 import net.md_5.bungee.protocol.packet.ClientStatus;
@@ -7,6 +8,7 @@ import net.md_5.bungee.protocol.packet.Login;
 import net.md_5.bungee.protocol.packet.Chat;
 import net.md_5.bungee.protocol.packet.EncryptionRequest;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerPosAndLookServer;
 import net.md_5.bungee.protocol.packet.TabCompleteRequest;
 import net.md_5.bungee.protocol.packet.ScoreboardObjective;
 import net.md_5.bungee.protocol.packet.ScoreboardScore;
@@ -128,4 +130,10 @@ public abstract class AbstractPacketHandler
     public void handle(LegacyHandshake legacyHandshake) throws Exception
     {
     }
+
+	public void handle(ChunkData chunkData) throws Exception {
+	}
+
+	public void handle(PlayerPosAndLookServer playerPosAndLookServer) throws Exception {
+	}
 }
