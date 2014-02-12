@@ -3,7 +3,9 @@ package net.md_5.bungee.conf;
 import com.google.common.base.Preconditions;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.Files;
+
 import gnu.trove.map.TMap;
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -14,12 +16,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import javax.imageio.ImageIO;
+
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyConfig;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.PatchworkInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.util.CaseInsensitiveMap;
 import net.md_5.bungee.util.CaseInsensitiveSet;
@@ -116,11 +121,12 @@ public class Configuration implements ProxyConfig
         {
             for ( ServerInfo oldServer : servers.values() )
             {
-                // Don't allow servers to be removed
-                Preconditions.checkArgument( newServers.containsValue( oldServer ), "Server %s removed on reload!", oldServer.getName() );
+                if (!(oldServer instanceof PatchworkInfo)){ // Don't allow servers to be removed, but patchworks aren't known yet
+                	Preconditions.checkArgument( newServers.containsValue( oldServer ), "Server %s removed on reload!", oldServer.getName() );
+                }
             }
 
-            // Add new servers
+            // Add new servers but don't update properties of existing ones
             for ( Map.Entry<String, ServerInfo> newServer : newServers.entrySet() )
             {
                 if ( !servers.containsValue( newServer.getValue() ) )
@@ -129,6 +135,8 @@ public class Configuration implements ProxyConfig
                 }
             }
         }
+        
+        servers.putAll(adapter.getPatchworks(newServers)); // should we add properties update checks here? I'd think no. ServersInfos are linked anyway.
 
         for ( ListenerInfo listener : listeners )
         {

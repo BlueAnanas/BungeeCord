@@ -14,18 +14,22 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
+
 import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.PatchInfo;
+import net.md_5.bungee.api.config.PatchworkInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.tab.Global;
 import net.md_5.bungee.tab.GlobalPing;
 import net.md_5.bungee.tab.ServerUnique;
 import net.md_5.bungee.util.CaseInsensitiveMap;
+
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -177,6 +181,56 @@ public class YamlConfig implements ConfigurationAdapter
             ret.put( name, info );
         }
 
+        return ret;
+    }
+
+    @Override
+    public Map<String, PatchworkInfo> getPatchworks(Map<String, ServerInfo> servers)
+    {
+        Map<String, Map<String, Map<String, Object>>> base = get( "patchworks", (Map<String, Map<String, Map<String, Object>>>) null );
+        Map<String, PatchworkInfo> ret = new HashMap<>();
+        int defaultPatchDistanceView = -1, defaultPatchDistanceConnect = -1;
+        Object val;
+
+        if (base != null) for ( Map.Entry<String, Map<String, Map<String, Object>>> entry : base.entrySet() ){
+            String pwName = entry.getKey();
+            Map<String, Map<String, Object>> pw = entry.getValue();
+            if (pwName == "patchdistance"){  //specify default for the following patchworks
+                val = get( "view", null, pw );
+                if (val != null) defaultPatchDistanceView = (int) val;
+                val = get( "connect", null, pw );
+                if (val != null) defaultPatchDistanceConnect = (int) val;
+            } else {
+            	PatchworkInfo pwInfo = ProxyServer.getInstance().constructPatchworkInfo(pwName);
+            	for ( Map.Entry<String, Map<String, Object>> subEntry : pw.entrySet() ){
+            		Map<String, Object> p = subEntry.getValue();
+            		String pName = subEntry.getKey();
+            		ServerInfo sInfo = servers.get(pName);
+            		if (sInfo != null){ // we simply drop if server is not already declared :(
+            			int minX = get( "borders.minx", Integer.MIN_VALUE, p );
+            			int maxX = get( "borders.maxx", Integer.MAX_VALUE, p );
+            			int minZ = get( "borders.minz", Integer.MIN_VALUE, p );
+            			int maxZ = get( "borders.maxz", Integer.MAX_VALUE, p );
+            			int viewDist, connectDist;
+            			val = get( "patchdistance.view", null, p );
+            			if (val != null) {
+            				viewDist = ((int) val) < 0 ? 10 : ((int) val);            				
+            			} else {
+            				viewDist = defaultPatchDistanceView < 0 ? 10 : defaultPatchDistanceView; // hardcoded fallback view distance
+            			}
+            			val = get( "patchdistance.connect", null, p );
+            			if (val != null) {
+            				connectDist = ((int) val) < viewDist ? viewDist + 1 : ((int) val);            				
+            			} else {
+            				connectDist = defaultPatchDistanceConnect < viewDist ? viewDist + 1 : defaultPatchDistanceConnect;
+            			}
+            			PatchInfo pInfo = ProxyServer.getInstance().constructPatchInfo(sInfo, minX, maxX, minZ, maxZ, viewDist, connectDist);
+            			pwInfo.addPatch(pInfo);
+            		}
+            	}
+            	ret.put( pwName, pwInfo );
+            }
+        }
         return ret;
     }
 
