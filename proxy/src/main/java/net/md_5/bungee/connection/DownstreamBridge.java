@@ -36,9 +36,9 @@ import net.md_5.bungee.protocol.packet.Kick;
 public class DownstreamBridge extends PacketHandler
 {
 
-    private final ProxyServer bungee;
-    private final UserConnection con;
-    private final ServerConnection server;
+    protected final ProxyServer bungee;
+    protected final UserConnection con;
+    protected final ServerConnection server;
 
     @Override
     public void exception(Throwable t) throws Exception

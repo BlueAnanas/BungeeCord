@@ -1,104 +1,53 @@
 package net.md_5.bungee;
 
-import com.google.common.base.Preconditions;
-import java.util.Objects;
 import java.util.Queue;
-import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ChatColor;
+
+import com.google.common.base.Preconditions;
+
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
-import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.score.Objective;
 import net.md_5.bungee.api.score.Scoreboard;
 import net.md_5.bungee.api.score.Team;
-import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.connection.CancelSendSignal;
-import net.md_5.bungee.connection.DownstreamBridge;
+import net.md_5.bungee.connection.HomePatchDownstreamBridge;
 import net.md_5.bungee.netty.HandlerBoss;
-import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.netty.PacketHandler;
-import net.md_5.bungee.protocol.MinecraftOutput;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.MinecraftOutput;
 import net.md_5.bungee.protocol.Protocol;
-import net.md_5.bungee.protocol.packet.EncryptionRequest;
-import net.md_5.bungee.protocol.packet.Handshake;
 import net.md_5.bungee.protocol.packet.Login;
+import net.md_5.bungee.protocol.packet.LoginSuccess;
+import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.Respawn;
 import net.md_5.bungee.protocol.packet.ScoreboardObjective;
-import net.md_5.bungee.protocol.packet.PluginMessage;
-import net.md_5.bungee.protocol.packet.Kick;
-import net.md_5.bungee.protocol.packet.LoginSuccess;
 
-@RequiredArgsConstructor
-public class ServerConnector extends PacketHandler
-{
-
-	protected final ProxyServer bungee;
-    protected ChannelWrapper ch;
-    protected final UserConnection user;
-    protected final BungeeServerInfo target;
-    protected State thisState = State.LOGIN_SUCCESS;
-
-    protected enum State
-    {
-
-        LOGIN_SUCCESS, ENCRYPT_RESPONSE, LOGIN, FINISHED;
-    }
+public class PatchworkConnector extends ServerConnector {
+	
+	private BungeePatchworkInfo patchwork;
+	
+	public PatchworkConnector(ProxyServer bungee, UserConnection user, BungeeServerInfo target) {
+		super(bungee, user, (BungeeServerInfo) ((BungeePatchworkInfo) target).getCurrentPatchInfo().getServer());
+        Preconditions.checkState( target instanceof BungeePatchworkInfo, "Need PatchworkInfo to connect to" );
+        patchwork = (BungeePatchworkInfo) target;
+	}
 
     @Override
-    public void exception(Throwable t) throws Exception
-    {
-        String message = "Exception Connecting:" + Util.exception( t );
-        if ( user.getServer() == null )
-        {
-            user.disconnect( message );
-        } else
-        {
-            user.sendMessage( ChatColor.RED + message );
-        }
-    }
-
-    @Override
-    public void connected(ChannelWrapper channel) throws Exception
-    {
-        this.ch = channel;
-
-        Handshake originalHandshake = user.getPendingConnection().getHandshake();
-        Handshake copiedHandshake = new Handshake( originalHandshake.getProtocolVersion(), originalHandshake.getHost(), originalHandshake.getPort(), 2 );
-        if ( BungeeCord.getInstance().config.isIpFoward() )
-        {
-            copiedHandshake.setHost( copiedHandshake.getHost() + "\00" + user.getAddress().getHostString() + "\00" + user.getUUID() );
-        }
-        channel.write( copiedHandshake );
-
-        channel.setProtocol( Protocol.LOGIN );
-        channel.write( user.getPendingConnection().getLoginRequest() );
-    }
-
-    @Override
-    public void disconnected(ChannelWrapper channel) throws Exception
-    {
-        user.getPendingConnects().remove( target );
-    }
-
-    @Override
-    public void handle(LoginSuccess loginSuccess) throws Exception
+    public void handle(LoginSuccess loginSuccess) throws Exception  // TODO: do we really need to set the protocol here already, we only await Login 
     {
         Preconditions.checkState( thisState == State.LOGIN_SUCCESS, "Not expecting LOGIN_SUCCESS" );
-        ch.setProtocol( Protocol.GAME );
+        ch.setProtocol( Protocol.GAMEONHOMEPATCH );
         thisState = State.LOGIN;
 
         throw CancelSendSignal.INSTANCE;
     }
-
+    
     @Override
     public void handle(Login login) throws Exception
     {
         Preconditions.checkState( thisState == State.LOGIN, "Not expecting LOGIN" );
 
-        ServerConnection server = new ServerConnection( ch, target );
+        ServerConnection server = new PatchworkConnection( ch, target, patchwork );
         ServerConnectedEvent event = new ServerConnectedEvent( user, server );
         bungee.getPluginManager().callEvent( event );
 
@@ -123,7 +72,7 @@ public class ServerConnector extends PacketHandler
             {
                 // Once again, first connection
                 user.setClientEntityId( login.getEntityId() );
-                user.setServerEntityId( login.getEntityId() );
+                user.setServerEntityId( login.getEntityId() ); // TODO: serverEntityId should be stored on ServerConnection
 
                 // Set tab list size, this sucks balls, TODO: what shall we do about packet mutability
                 Login modLogin = new Login( login.getEntityId(), login.getGameMode(), (byte) login.getDimension(), login.getDifficulty(),
@@ -135,7 +84,7 @@ public class ServerConnector extends PacketHandler
                 out.writeStringUTF8WithoutLengthHeaderBecauseDinnerboneStuffedUpTheMCBrandPacket( ProxyServer.getInstance().getName() + " (" + ProxyServer.getInstance().getVersion() + ")" );
                 user.unsafe().sendPacket( new PluginMessage( "MC|Brand", out.toArray() ) );
             } else
-            {
+            {  // TODO: lots of things as we don't know if we have to server hop 
                 user.getTabList().onServerChange();
 
                 Scoreboard serverScoreboard = user.getServerSentScoreboard();
@@ -175,7 +124,7 @@ public class ServerConnector extends PacketHandler
             user.setDimensionChange( false );
 
             user.setServer( server );
-            ch.getHandle().pipeline().get( HandlerBoss.class ).setHandler( new DownstreamBridge( bungee, user, server ) );
+            ch.getHandle().pipeline().get( HandlerBoss.class ).setHandler( new HomePatchDownstreamBridge( bungee, user, server ) );
         }
 
         bungee.getPluginManager().callEvent( new ServerSwitchEvent( user ) );
@@ -184,43 +133,10 @@ public class ServerConnector extends PacketHandler
 
         throw CancelSendSignal.INSTANCE;
     }
-
-    @Override
-    public void handle(EncryptionRequest encryptionRequest) throws Exception
-    {
-        throw new RuntimeException( "Server is online mode!" );
-    }
-
-    @Override
-    public void handle(Kick kick) throws Exception
-    {
-        ServerInfo def = bungee.getServerInfo( user.getPendingConnection().getListener().getFallbackServer() );
-        if ( Objects.equals( target, def ) )
-        {
-            def = null;
-        }
-        ServerKickEvent event = bungee.getPluginManager().callEvent( new ServerKickEvent( user, ComponentSerializer.parse( kick.getMessage() ), def, ServerKickEvent.State.CONNECTING ) );
-        if ( event.isCancelled() && event.getCancelServer() != null )
-        {
-            user.connect( event.getCancelServer() );
-            throw CancelSendSignal.INSTANCE;
-        }
-
-        String message = bungee.getTranslation( "connect_kick" ) + target.getName() + ": " + event.getKickReason();
-        if ( user.isDimensionChange() )
-        {
-            user.disconnect( message );
-        } else
-        {
-            user.sendMessage( message );
-        }
-
-        throw CancelSendSignal.INSTANCE;
-    }
-
+    
     @Override
     public String toString()
     {
-        return "[" + user.getName() + "] <-> ServerConnector [" + target.getName() + "]";
+        return "[" + user.getName() + "] <-> PatchworkConnector [" + target.getName() + "]";
     }
 }
