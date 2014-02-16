@@ -1,5 +1,6 @@
 package net.md_5.bungee.protocol;
 
+import net.md_5.bungee.protocol.packet.BulkChunkData;
 import net.md_5.bungee.protocol.packet.ChunkData;
 import net.md_5.bungee.protocol.packet.KeepAlive;
 import net.md_5.bungee.protocol.packet.ClientSettings;
@@ -134,6 +135,9 @@ public abstract class AbstractPacketHandler
 	public void handle(ChunkData chunkData) throws Exception {
 	}
 
+	public void handle(BulkChunkData bulkChunkData) throws Exception {
+	}
+	
 	public void handle(PlayerPosAndLookServer playerPosAndLookServer) throws Exception {
 	}
 }
