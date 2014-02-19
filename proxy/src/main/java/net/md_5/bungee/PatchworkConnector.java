@@ -12,12 +12,12 @@ import net.md_5.bungee.api.score.Scoreboard;
 import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.connection.CancelSendSignal;
 import net.md_5.bungee.connection.HomePatchDownstreamBridge;
+import net.md_5.bungee.connection.HomePatchUpstreamBridge;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.MinecraftOutput;
 import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.packet.Login;
-import net.md_5.bungee.protocol.packet.LoginSuccess;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.Respawn;
 import net.md_5.bungee.protocol.packet.ScoreboardObjective;
@@ -25,23 +25,14 @@ import net.md_5.bungee.protocol.packet.ScoreboardObjective;
 public class PatchworkConnector extends ServerConnector {
 	
 	private BungeePatchworkInfo patchwork;
+    // superclass BungeeServerInfo target in fact BungeePatchInfo here
 	
 	public PatchworkConnector(ProxyServer bungee, UserConnection user, BungeeServerInfo target) {
-		super(bungee, user, (BungeeServerInfo) ((BungeePatchworkInfo) target).getCurrentPatchInfo().getServer());
+		super(bungee, user, (BungeeServerInfo) ((BungeePatchworkInfo) target).getCurrentPatchInfo());
         Preconditions.checkState( target instanceof BungeePatchworkInfo, "Need PatchworkInfo to connect to" );
         patchwork = (BungeePatchworkInfo) target;
 	}
 
-    @Override
-    public void handle(LoginSuccess loginSuccess) throws Exception  // TODO: do we really need to set the protocol here already, we only await Login 
-    {
-        Preconditions.checkState( thisState == State.LOGIN_SUCCESS, "Not expecting LOGIN_SUCCESS" );
-        ch.setProtocol( Protocol.GAMEONHOMEPATCH );
-        thisState = State.LOGIN;
-
-        throw CancelSendSignal.INSTANCE;
-    }
-    
     @Override
     public void handle(Login login) throws Exception
     {
@@ -124,7 +115,11 @@ public class PatchworkConnector extends ServerConnector {
             user.setDimensionChange( false );
 
             user.setServer( server );
+            ch.setProtocol( Protocol.GAMEONHOMEPATCH );
             ch.getHandle().pipeline().get( HandlerBoss.class ).setHandler( new HomePatchDownstreamBridge( bungee, user, server ) );
+            // switch existing Upstream Bridge to Patchwork Bridge *** Should we switch back if connecting to server again?
+            user.getCh().setProtocol( Protocol.GAMEONHOMEPATCH );
+            user.getCh().getHandle().pipeline().get( HandlerBoss.class ).setHandler( new HomePatchUpstreamBridge( bungee, user ) );
         }
 
         bungee.getPluginManager().callEvent( new ServerSwitchEvent( user ) );

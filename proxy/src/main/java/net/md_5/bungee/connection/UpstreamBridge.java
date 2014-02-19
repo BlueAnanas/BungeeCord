@@ -1,8 +1,8 @@
 package net.md_5.bungee.connection;
 
 import com.google.common.base.Preconditions;
+
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.EntityMap;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
@@ -17,15 +17,17 @@ import net.md_5.bungee.protocol.packet.Chat;
 import net.md_5.bungee.protocol.packet.TabCompleteRequest;
 import net.md_5.bungee.protocol.packet.ClientSettings;
 import net.md_5.bungee.protocol.packet.PluginMessage;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
 public class UpstreamBridge extends PacketHandler
 {
 
-    private final ProxyServer bungee;
-    private final UserConnection con;
+    protected final ProxyServer bungee;
+    protected final UserConnection con;
 
     public UpstreamBridge(ProxyServer bungee, UserConnection con)
     {

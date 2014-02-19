@@ -21,7 +21,7 @@ public class ServerConnection implements Server
     @Getter
     private final ChannelWrapper ch;
     @Getter
-    private final BungeeServerInfo info;
+    protected final BungeeServerInfo info;
     @Getter
     @Setter
     private boolean isObsolete;

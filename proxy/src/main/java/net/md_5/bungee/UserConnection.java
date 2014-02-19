@@ -56,6 +56,7 @@ public final class UserConnection implements ProxiedPlayer
     /*========================================================================*/
     @NonNull
     private final ProxyServer bungee;
+    @Getter
     @NonNull
     private final ChannelWrapper ch;
     @Getter
@@ -196,6 +197,7 @@ public final class UserConnection implements ProxiedPlayer
     public void connect(ServerInfo info, final Callback<Boolean> callback, final boolean retry)
     {
         Preconditions.checkNotNull( info, "info" );
+        System.out.println("Userconnection.connect1 info=" + info.getName() + ", class=" + info.getClass().getSimpleName() + ", isPatchwork=" + (info instanceof PatchworkInfo));
 
         ServerConnectEvent event = new ServerConnectEvent( this, info );
         if ( bungee.getPluginManager().callEvent( event ).isCancelled() )
@@ -204,6 +206,8 @@ public final class UserConnection implements ProxiedPlayer
         }
 
         final BungeeServerInfo target = (BungeeServerInfo) event.getTarget(); // Update in case the event changed target
+        System.out.println("Userconnection.connect2 info=" + info.getName() + ", class=" + info.getClass().getSimpleName() + ", isPatchwork=" + (info instanceof PatchworkInfo));
+        
 
         if ( getServer() != null && Objects.equals( getServer().getInfo(), target ) )
         {
@@ -226,7 +230,7 @@ public final class UserConnection implements ProxiedPlayer
                 PipelineUtils.BASE.initChannel( ch );
                 ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
                 ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
-                ch.pipeline().get( HandlerBoss.class ).setHandler( target instanceof PatchworkInfo ? new ServerConnector( bungee, UserConnection.this, target ) : new ServerConnector( bungee, UserConnection.this, target ));
+                ch.pipeline().get( HandlerBoss.class ).setHandler( target instanceof PatchworkInfo ? new PatchworkConnector( bungee, UserConnection.this, target ) : new ServerConnector( bungee, UserConnection.this, target ));
             }
         };
         ChannelFutureListener listener = new ChannelFutureListener()
