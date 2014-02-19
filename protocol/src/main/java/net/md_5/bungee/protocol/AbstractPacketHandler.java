@@ -9,7 +9,11 @@ import net.md_5.bungee.protocol.packet.Login;
 import net.md_5.bungee.protocol.packet.Chat;
 import net.md_5.bungee.protocol.packet.EncryptionRequest;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerLook;
+import net.md_5.bungee.protocol.packet.PlayerOnGround;
+import net.md_5.bungee.protocol.packet.PlayerPosAndLook;
 import net.md_5.bungee.protocol.packet.PlayerPosAndLookServer;
+import net.md_5.bungee.protocol.packet.PlayerPosition;
 import net.md_5.bungee.protocol.packet.TabCompleteRequest;
 import net.md_5.bungee.protocol.packet.ScoreboardObjective;
 import net.md_5.bungee.protocol.packet.ScoreboardScore;
@@ -139,5 +143,17 @@ public abstract class AbstractPacketHandler
 	}
 	
 	public void handle(PlayerPosAndLookServer playerPosAndLookServer) throws Exception {
+	}
+	
+	public void handle(PlayerPosAndLook playerPosAndLook) throws Exception {
+	}
+	
+	public void handle(PlayerLook playerLook) throws Exception {
+	}
+	
+	public void handle(PlayerPosition playerPosition) throws Exception {
+	}
+	
+	public void handle(PlayerOnGround playerOnGround) throws Exception {
 	}
 }

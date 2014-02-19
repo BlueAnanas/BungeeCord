@@ -24,7 +24,11 @@ import net.md_5.bungee.protocol.packet.LoginRequest;
 import net.md_5.bungee.protocol.packet.LoginSuccess;
 import net.md_5.bungee.protocol.packet.PingPacket;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerLook;
+import net.md_5.bungee.protocol.packet.PlayerOnGround;
+import net.md_5.bungee.protocol.packet.PlayerPosAndLook;
 import net.md_5.bungee.protocol.packet.PlayerPosAndLookServer;
+import net.md_5.bungee.protocol.packet.PlayerPosition;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.Respawn;
 import net.md_5.bungee.protocol.packet.ScoreboardDisplay;
@@ -125,6 +129,10 @@ public enum Protocol
 
                     TO_SERVER.registerPacket( 0x00, KeepAlive.class );
                     TO_SERVER.registerPacket( 0x01, Chat.class );
+                    TO_SERVER.registerPacket( 0x03, PlayerOnGround.class );
+                    TO_SERVER.registerPacket( 0x04, PlayerPosition.class );
+                    TO_SERVER.registerPacket( 0x05, PlayerLook.class );
+                    TO_SERVER.registerPacket( 0x06, PlayerPosAndLook.class );
                     TO_SERVER.registerPacket( 0x14, TabCompleteRequest.class );
                     TO_SERVER.registerPacket( 0x15, ClientSettings.class );
                     TO_SERVER.registerPacket( 0x17, PluginMessage.class );
@@ -154,6 +162,10 @@ public enum Protocol
 
                     TO_SERVER.registerPacket( 0x00, KeepAlive.class );
                     TO_SERVER.registerPacket( 0x01, Chat.class );
+                    TO_SERVER.registerPacket( 0x03, PlayerOnGround.class );
+                    TO_SERVER.registerPacket( 0x04, PlayerPosition.class );
+                    TO_SERVER.registerPacket( 0x05, PlayerLook.class );
+                    TO_SERVER.registerPacket( 0x06, PlayerPosAndLook.class );
                     TO_SERVER.registerPacket( 0x14, TabCompleteRequest.class );
                     TO_SERVER.registerPacket( 0x15, ClientSettings.class );
                     TO_SERVER.registerPacket( 0x17, PluginMessage.class );
