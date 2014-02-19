@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.BungeePatchInfo;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -32,6 +33,8 @@ import net.md_5.bungee.util.CaseInsensitiveMap;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+
+import com.google.common.base.Preconditions;
 
 public class YamlConfig implements ConfigurationAdapter
 {
@@ -195,7 +198,7 @@ public class YamlConfig implements ConfigurationAdapter
         if (base != null) for ( Map.Entry<String, Map<String, Map<String, Object>>> entry : base.entrySet() ){
             String pwName = entry.getKey();
             Map<String, Map<String, Object>> pw = entry.getValue();
-            if (pwName == "patchdistance"){  //specify default for the following patchworks
+            if (pwName.equals("patchdistance")){  //specify default for the following patchworks
                 val = get( "view", null, pw );
                 if (val != null) defaultPatchDistanceView = (int) val;
                 val = get( "connect", null, pw );
@@ -203,14 +206,18 @@ public class YamlConfig implements ConfigurationAdapter
             } else {
             	PatchworkInfo pwInfo = ProxyServer.getInstance().constructPatchworkInfo(pwName);
             	for ( Map.Entry<String, Map<String, Object>> subEntry : pw.entrySet() ){
-            		Map<String, Object> p = subEntry.getValue();
             		String pName = subEntry.getKey();
+            		Map<String, Object> p = subEntry.getValue();
             		ServerInfo sInfo = servers.get(pName);
             		if (sInfo != null){ // we simply drop if server is not already declared :(
             			int minX = get( "borders.minx", Integer.MIN_VALUE, p );
+            	        Preconditions.checkArgument( minX % 16 == 0 || minX == Integer.MIN_VALUE, "Patchwork " + pwName + ", Patch " + pName + ": minx not multiple of 16" );
             			int maxX = get( "borders.maxx", Integer.MAX_VALUE, p );
+            	        Preconditions.checkArgument( maxX % 16 == 0 || maxX == Integer.MAX_VALUE, "Patchwork " + pwName + ", Patch " + pName + ": maxx not multiple of 16" );
             			int minZ = get( "borders.minz", Integer.MIN_VALUE, p );
+            	        Preconditions.checkArgument( minZ % 16 == 0 || minZ == Integer.MIN_VALUE, "Patchwork " + pwName + ", Patch " + pName + ": minz not multiple of 16" );
             			int maxZ = get( "borders.maxz", Integer.MAX_VALUE, p );
+            	        Preconditions.checkArgument( maxZ % 16 == 0 || maxZ == Integer.MAX_VALUE, "Patchwork " + pwName + ", Patch " + pName + ": maxz not multiple of 16" );
             			int viewDist, connectDist;
             			val = get( "patchdistance.view", null, p );
             			if (val != null) {
@@ -228,6 +235,7 @@ public class YamlConfig implements ConfigurationAdapter
             			pwInfo.addPatch(pInfo);
             		}
             	}
+            	for (PatchInfo pi: pwInfo.getPatchInfos()) ((BungeePatchInfo) pi).setupNearbyPatches(pwInfo);
             	ret.put( pwName, pwInfo );
             }
         }
