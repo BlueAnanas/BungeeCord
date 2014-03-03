@@ -49,17 +49,17 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git@github.com:SpigotMC/BungeeCord.git</connection>
-        <developerConnection>scm:git:git@github.com:SpigotMC/BungeeCord.git</developerConnection>
-        <url>git@github.com:SpigotMC/BungeeCord.git</url>
+        <connection>scm:git:git@github.com:BlueAnanas/BungeeCord.git</connection>
+        <developerConnection>scm:git:git@github.com:BlueAnanas/BungeeCord.git</developerConnection>
+        <url>git@github.com:BlueAnanas/BungeeCord.git</url>
     </scm>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/SpigotMC/BungeeCord/issues</url>
+        <url>https://github.com/BlueAnanas/BungeeCord/issues</url>
     </issueManagement>
     <ciManagement>
         <system>jenkins</system>
-        <url>http://ci.md-5.net/job/BungeeCord</url>
+        <url>http://jenkins.sajuk.de/job/BungeeCordPatchwork</url>
     </ciManagement>
 
     <properties>
